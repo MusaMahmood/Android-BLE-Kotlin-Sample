@@ -110,8 +110,8 @@ class DataChannel {
         return b & 0xFF;
     }
 
-//    private static int unsignedToSigned(int unsigned, int size) {
-//        if ((unsigned & (1 << size - 1)) != 0) unsigned = -1 * ((1 << size - 1) - (unsigned & ((1 << size - 1) - 1)));
-//        return unsigned;
-//    }
+    private static int unsignedToSigned(int unsigned, int size) {
+        if ((unsigned & (1 << size - 1)) != 0) unsigned = -1 * ((1 << size - 1) - (unsigned & ((1 << size - 1) - 1)));
+        return unsigned;
+    }
 }

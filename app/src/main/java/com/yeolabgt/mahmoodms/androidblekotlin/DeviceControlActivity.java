@@ -424,22 +424,22 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
         mGraphAdapterCh1PSDA = new GraphAdapter(mPSDDataPointsToShow, "EEG Power Spectrum (Ch1)", false, Color.BLUE);
         mGraphAdapterCh2PSDA = new GraphAdapter(mPSDDataPointsToShow, "EEG Power Spectrum (Ch2)", false, Color.RED);
         //PLOT CH1 By default
-        mGraphAdapterCh1.plotData = true;
-        mGraphAdapterCh1PSDA.plotData = true;
-        mGraphAdapterCh2PSDA.plotData = true;
+        mGraphAdapterCh1.setPlotData(true);
+        mGraphAdapterCh1PSDA.setPlotData(true);
+        mGraphAdapterCh2PSDA.setPlotData(true);
         mGraphAdapterCh1.setPointWidth((float) 2);
         mGraphAdapterCh2.setPointWidth((float) 2);
         mGraphAdapterCh1PSDA.setPointWidth((float) 2);
         mGraphAdapterCh2PSDA.setPointWidth((float) 2);
         mTimeDomainPlotAdapter = new XYPlotAdapter(findViewById(R.id.eegTimeDomainXYPlot), false, 1000);
         if(mTimeDomainPlotAdapter.getXyPlot()!=null) {
-            mTimeDomainPlotAdapter.getXyPlot().addSeries(mGraphAdapterCh1.series, mGraphAdapterCh1.lineAndPointFormatter);
-            mTimeDomainPlotAdapter.getXyPlot().addSeries(mGraphAdapterCh2.series, mGraphAdapterCh2.lineAndPointFormatter);
+            mTimeDomainPlotAdapter.getXyPlot().addSeries(mGraphAdapterCh1.getSeries(), mGraphAdapterCh1.getLineAndPointFormatter());
+            mTimeDomainPlotAdapter.getXyPlot().addSeries(mGraphAdapterCh2.getSeries(), mGraphAdapterCh2.getLineAndPointFormatter());
         }
         mFreqDomainPlotAdapter = new XYPlotAdapter(findViewById(R.id.frequencyAnalysisXYPlot), "Frequency (Hz)", "Power Density (W/Hz)", ((double) mSampleRate / 125.0));
         if(mFreqDomainPlotAdapter.getXyPlot()!=null) {
-            mFreqDomainPlotAdapter.getXyPlot().addSeries(mGraphAdapterCh1PSDA.series, mGraphAdapterCh1PSDA.lineAndPointFormatter);
-            mFreqDomainPlotAdapter.getXyPlot().addSeries(mGraphAdapterCh2PSDA.series, mGraphAdapterCh2PSDA.lineAndPointFormatter);
+            mFreqDomainPlotAdapter.getXyPlot().addSeries(mGraphAdapterCh1PSDA.getSeries(), mGraphAdapterCh1PSDA.getLineAndPointFormatter());
+            mFreqDomainPlotAdapter.getXyPlot().addSeries(mGraphAdapterCh2PSDA.getSeries(), mGraphAdapterCh2PSDA.getLineAndPointFormatter());
         }
         mRedrawer = new Redrawer(
                 Arrays.asList(new Plot[]{mTimeDomainPlotAdapter.getXyPlot(), mFreqDomainPlotAdapter.getXyPlot()}), 30, false);
@@ -736,23 +736,23 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
             }
         } else {
             if (mPrimarySaveDataFile.getResolutionBits() == 24) {
-                for (int i = 0; i < dataChannel.dataBuffer.length / 3; i += graphAdapter.sampleRate / 250) {
+                for (int i = 0; i < dataChannel.dataBuffer.length / 3; i += graphAdapter.getSampleRate() / 250) {
                     graphAdapter.addDataPointTimeDomain(DataChannel.bytesToDouble(dataChannel.dataBuffer[3 * i],
                             dataChannel.dataBuffer[3 * i + 1], dataChannel.dataBuffer[3 * i + 2]),
                             dataChannel.totalDataPointsReceived - dataChannel.dataBuffer.length / 3 + i);
                     if (updateTrainingRoutine) {
-                        for (int j = 0; j < graphAdapter.sampleRate / 250; j++) {
+                        for (int j = 0; j < graphAdapter.getSampleRate() / 250; j++) {
                             updateTrainingRoutine(dataChannel.totalDataPointsReceived - dataChannel.dataBuffer.length / 3 + i + j);
                         }
                     }
                 }
             } else if (mPrimarySaveDataFile.getResolutionBits() == 16) {
-                for (int i = 0; i < dataChannel.dataBuffer.length / 2; i += graphAdapter.sampleRate / 250) {
+                for (int i = 0; i < dataChannel.dataBuffer.length / 2; i += graphAdapter.getSampleRate() / 250) {
                     graphAdapter.addDataPointTimeDomain(DataChannel.bytesToDouble(dataChannel.dataBuffer[2 * i],
                             dataChannel.dataBuffer[2 * i + 1]),
                             dataChannel.totalDataPointsReceived - dataChannel.dataBuffer.length / 2 + i);
                     if (updateTrainingRoutine) {
-                        for (int j = 0; j < graphAdapter.sampleRate / 250; j++) {
+                        for (int j = 0; j < graphAdapter.getSampleRate() / 250; j++) {
                             updateTrainingRoutine(dataChannel.totalDataPointsReceived - dataChannel.dataBuffer.length / 2 + i + j);
                         }
                     }
