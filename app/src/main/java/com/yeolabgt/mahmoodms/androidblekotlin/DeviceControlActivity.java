@@ -432,14 +432,17 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
         mGraphAdapterCh1PSDA.setPointWidth((float) 2);
         mGraphAdapterCh2PSDA.setPointWidth((float) 2);
         mTimeDomainPlotAdapter = new XYPlotAdapter(findViewById(R.id.eegTimeDomainXYPlot), false, 1000);
-        mTimeDomainPlotAdapter.xyPlot.addSeries(mGraphAdapterCh1.series, mGraphAdapterCh1.lineAndPointFormatter);
-        mTimeDomainPlotAdapter.xyPlot.addSeries(mGraphAdapterCh2.series, mGraphAdapterCh2.lineAndPointFormatter);
+        if(mTimeDomainPlotAdapter.getXyPlot()!=null) {
+            mTimeDomainPlotAdapter.getXyPlot().addSeries(mGraphAdapterCh1.series, mGraphAdapterCh1.lineAndPointFormatter);
+            mTimeDomainPlotAdapter.getXyPlot().addSeries(mGraphAdapterCh2.series, mGraphAdapterCh2.lineAndPointFormatter);
+        }
         mFreqDomainPlotAdapter = new XYPlotAdapter(findViewById(R.id.frequencyAnalysisXYPlot), "Frequency (Hz)", "Power Density (W/Hz)", ((double) mSampleRate / 125.0));
-        mFreqDomainPlotAdapter.xyPlot.addSeries(mGraphAdapterCh1PSDA.series, mGraphAdapterCh1PSDA.lineAndPointFormatter);
-        mFreqDomainPlotAdapter.xyPlot.addSeries(mGraphAdapterCh2PSDA.series, mGraphAdapterCh2PSDA.lineAndPointFormatter);
-
+        if(mFreqDomainPlotAdapter.getXyPlot()!=null) {
+            mFreqDomainPlotAdapter.getXyPlot().addSeries(mGraphAdapterCh1PSDA.series, mGraphAdapterCh1PSDA.lineAndPointFormatter);
+            mFreqDomainPlotAdapter.getXyPlot().addSeries(mGraphAdapterCh2PSDA.series, mGraphAdapterCh2PSDA.lineAndPointFormatter);
+        }
         mRedrawer = new Redrawer(
-                Arrays.asList(new Plot[]{mTimeDomainPlotAdapter.xyPlot, mFreqDomainPlotAdapter.xyPlot}), 30, false);
+                Arrays.asList(new Plot[]{mTimeDomainPlotAdapter.getXyPlot(), mFreqDomainPlotAdapter.getXyPlot()}), 30, false);
         mRedrawer.start();
         mGraphInitializedBoolean = true;
     }
