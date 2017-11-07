@@ -95,8 +95,8 @@ public class BluetoothLe {
      * @param characteristic BluetoothGattCharacteristic of the device.
      */
     public void readCharacteristic(BluetoothGatt mGatt, BluetoothGattCharacteristic characteristic) {
-        ReadWriteCharacteristic readWriteCharacteristic = new ReadWriteCharacteristic(ProcessQueueExecutor.REQUEST_TYPE_READ_CHAR, mGatt, characteristic);
-        ProcessQueueExecutor.addProcess(readWriteCharacteristic);
+        ReadWriteCharacteristic readWriteCharacteristic = new ReadWriteCharacteristic(ProcessQueueExecutor.Companion.getREQUEST_TYPE_READ_CHAR(), mGatt, characteristic);
+        ProcessQueueExecutor.Companion.addProcess(readWriteCharacteristic);
     }
 
     /**
@@ -108,8 +108,8 @@ public class BluetoothLe {
      */
     public void writeCharacteristic(BluetoothGatt mGatt, BluetoothGattCharacteristic characteristic, byte[] b) {
         characteristic.setValue(b);
-        ReadWriteCharacteristic readWriteCharacteristic = new ReadWriteCharacteristic(ProcessQueueExecutor.REQUEST_TYPE_WRITE_CHAR, mGatt, characteristic);
-        ProcessQueueExecutor.addProcess(readWriteCharacteristic);
+        ReadWriteCharacteristic readWriteCharacteristic = new ReadWriteCharacteristic(ProcessQueueExecutor.Companion.getREQUEST_TYPE_WRITE_CHAR(), mGatt, characteristic);
+        ProcessQueueExecutor.Companion.addProcess(readWriteCharacteristic);
     }
 
     /**
@@ -119,8 +119,8 @@ public class BluetoothLe {
      * @param characteristic BluetoothGattCharacteristic of the device.
      */
     public void readDescriptor(BluetoothGatt mGatt, BluetoothGattCharacteristic characteristic) {
-        ReadWriteCharacteristic readWriteCharacteristic = new ReadWriteCharacteristic(ProcessQueueExecutor.REQUEST_TYPE_READ_DESCRIPTOR, mGatt, characteristic);
-        ProcessQueueExecutor.addProcess(readWriteCharacteristic);
+        ReadWriteCharacteristic readWriteCharacteristic = new ReadWriteCharacteristic(ProcessQueueExecutor.Companion.getREQUEST_TYPE_READ_DESCRIPTOR(), mGatt, characteristic);
+        ProcessQueueExecutor.Companion.addProcess(readWriteCharacteristic);
     }
 
     /**
@@ -132,8 +132,8 @@ public class BluetoothLe {
      */
     public void writeDescriptor(BluetoothGatt mGatt, BluetoothGattCharacteristic characteristic, byte[] b) {
         characteristic.setValue(b);
-        ReadWriteCharacteristic readWriteCharacteristic = new ReadWriteCharacteristic(ProcessQueueExecutor.REQUEST_TYPE_WRITE_DESCRIPTOR, mGatt, characteristic);
-        ProcessQueueExecutor.addProcess(readWriteCharacteristic);
+        ReadWriteCharacteristic readWriteCharacteristic = new ReadWriteCharacteristic(ProcessQueueExecutor.Companion.getREQUEST_TYPE_WRITE_DESCRIPTOR(), mGatt, characteristic);
+        ProcessQueueExecutor.Companion.addProcess(readWriteCharacteristic);
     }
 
     /**
@@ -151,8 +151,8 @@ public class BluetoothLe {
             return;
         }
         clientConfig.setValue(enabled ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
-        ReadWriteCharacteristic readWriteCharacteristic = new ReadWriteCharacteristic(ProcessQueueExecutor.REQUEST_TYPE_WRITE_DESCRIPTOR, mGatt, clientConfig);
-        ProcessQueueExecutor.addProcess(readWriteCharacteristic);
+        ReadWriteCharacteristic readWriteCharacteristic = new ReadWriteCharacteristic(ProcessQueueExecutor.Companion.getREQUEST_TYPE_WRITE_DESCRIPTOR(), mGatt, clientConfig);
+        ProcessQueueExecutor.Companion.addProcess(readWriteCharacteristic);
     }
     // -----------------------------------------------------------***-------------------------------------------------------------------//
 
