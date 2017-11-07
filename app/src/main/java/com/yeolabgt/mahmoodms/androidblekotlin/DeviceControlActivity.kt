@@ -217,6 +217,11 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
         }
         mChannelSelect = findViewById(R.id.toggleButtonCh1)
         mChannelSelect!!.setOnCheckedChangeListener { _, b ->
+            if (b) {
+                mGraphAdapterCh2!!.clearPlot()
+            } else {
+                mGraphAdapterCh1!!.clearPlot()
+            }
             mGraphAdapterCh1!!.plotData = b
             mGraphAdapterCh2!!.plotData = !b
         }
@@ -497,21 +502,22 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 1) {
+            val context = applicationContext
             //UI Stuff:
-            val chSel = PreferencesFragment.channelSelect(this)
-            val longPSDA = PreferencesFragment.psdaWideRange(this)
-            val showPSDA = PreferencesFragment.showPSDA(this)
-            val showUIElements = PreferencesFragment.showUIElements(this)
+            val chSel = PreferencesFragment.channelSelect(context)
+            val longPSDA = PreferencesFragment.psdaWideRange(context)
+            val showPSDA = PreferencesFragment.showPSDA(context)
+            val showUIElements = PreferencesFragment.showUIElements(context)
             //File Save Stuff
-            val saveTimestamps = PreferencesFragment.saveTimestamps(this)
-            val precision = (if (PreferencesFragment.setBitPrecision(this)) 64 else 32).toShort()
-            val saveClass = PreferencesFragment.saveClass(this)
+            val saveTimestamps = PreferencesFragment.saveTimestamps(context)
+            val precision = (if (PreferencesFragment.setBitPrecision(context)) 64 else 32).toShort()
+            val saveClass = PreferencesFragment.saveClass(context)
             mPrimarySaveDataFile!!.setSaveTimestamps(saveTimestamps)
             mPrimarySaveDataFile!!.setFpPrecision(precision)
             mPrimarySaveDataFile!!.setIncludeClass(saveClass)
-            val filterData = PreferencesFragment.setFilterData(this)
+            val filterData = PreferencesFragment.setFilterData(context)
             //TODO: for now just ch1:
             if (mGraphAdapterCh1 != null) {
                 mFilterData = filterData
@@ -537,7 +543,7 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
     }
 
     private fun launchSettingsMenu() {
-        val intent = Intent(this, SettingsActivity::class.java)
+        val intent = Intent(applicationContext, SettingsActivity::class.java)
         startActivityForResult(intent, 1)
     }
 
@@ -1039,7 +1045,7 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
         //RSSI:
         private val RSSI_UPDATE_TIME_INTERVAL = 2000
         var mSSVEPClass = 0.0
-        //Save Data File [NEW!]
+        //Save Data File
         private var mPrimarySaveDataFile: SaveDataFile? = null
         //Tensorflow CONSTANTS:
         val INPUT_DATA_FEED = "input"

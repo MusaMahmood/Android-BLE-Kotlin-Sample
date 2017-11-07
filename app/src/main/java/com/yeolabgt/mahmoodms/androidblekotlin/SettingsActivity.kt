@@ -14,8 +14,7 @@ class SettingsActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fragmentManager.beginTransaction()
-                .replace(android.R.id.content, PreferencesFragment()).commit()
+        fragmentManager!!.beginTransaction().replace(android.R.id.content, PreferencesFragment()).commit()
         val actionBar = actionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
     }
