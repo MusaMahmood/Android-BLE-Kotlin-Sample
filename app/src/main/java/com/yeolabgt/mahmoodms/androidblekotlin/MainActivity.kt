@@ -104,7 +104,7 @@ class MainActivity : Activity() {
             val item = scannedDeviceAdapter!!.getItem(position)
             if (item != null) {
                 if (!mDeviceAddressesMAC.contains(item.deviceMac)) {
-                    mDeviceNames.add(item.displayName)
+                    mDeviceNames.add(item.displayName.toString())
                     mDeviceAddressesMAC.add(item.deviceMac)
                     mDevicesSelectedCount++
                     scannedDeviceAdapter!!.remove(position)
