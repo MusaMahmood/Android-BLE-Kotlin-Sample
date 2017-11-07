@@ -1,4 +1,4 @@
-package com.yeolabgt.mahmoodms.kotlinsample
+package com.yeolabgt.mahmoodms.androidblekotlin
 
 import org.junit.Test
 

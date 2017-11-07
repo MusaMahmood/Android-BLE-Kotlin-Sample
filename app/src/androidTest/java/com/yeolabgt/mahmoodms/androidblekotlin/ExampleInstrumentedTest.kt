@@ -1,4 +1,4 @@
-package com.yeolabgt.mahmoodms.kotlinsample
+package com.yeolabgt.mahmoodms.androidblekotlin
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("com.yeolabgt.mahmoodms.kotlinsample", appContext.packageName)
+        assertEquals("com.yeolabgt.mahmoodms.androidssvepinterfacetf", appContext.packageName)
     }
 }
