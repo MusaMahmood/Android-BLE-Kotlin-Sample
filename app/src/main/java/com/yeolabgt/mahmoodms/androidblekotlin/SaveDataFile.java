@@ -83,12 +83,12 @@ class SaveDataFile {
         for (int ch = 0; ch < len; ch++) { // each channel
             if(this.mResolutionBits == 16) {
                 for (int dp = 0; dp < byteArrays[ch].length/2; dp++) { // each datapoint
-                    floats[ch][dp] = DataChannel.bytesToFloat32(byteArrays[ch][2*dp],
+                    floats[ch][dp] = DataChannel.Companion.bytesToFloat32(byteArrays[ch][2*dp],
                             byteArrays[ch][2*dp+1]);
                 }
             } else if (this.mResolutionBits == 24) {
                 for (int dp = 0; dp < byteArrays[ch].length/3; dp++) {
-                    floats[ch][dp] = DataChannel.bytesToFloat32(byteArrays[ch][3*dp],
+                    floats[ch][dp] = DataChannel.Companion.bytesToFloat32(byteArrays[ch][3*dp],
                             byteArrays[ch][3*dp+1], byteArrays[ch][3*dp+2]);
                 }
             }
@@ -109,12 +109,12 @@ class SaveDataFile {
         for (int ch = 0; ch < len; ch++) { // each channel
             if(this.mResolutionBits == 16) {
                 for (int dp = 0; dp < byteArrays[ch].length/2; dp++) { // each datapoint
-                    doubles[ch][dp] = DataChannel.bytesToDouble(byteArrays[ch][2*dp],
+                    doubles[ch][dp] = DataChannel.Companion.bytesToDouble(byteArrays[ch][2*dp],
                             byteArrays[ch][2*dp+1]);
                 }
             } else if (this.mResolutionBits == 24) {
                 for (int dp = 0; dp < byteArrays[ch].length/3; dp++) {
-                    doubles[ch][dp] = DataChannel.bytesToDouble(byteArrays[ch][3*dp],
+                    doubles[ch][dp] = DataChannel.Companion.bytesToDouble(byteArrays[ch][3*dp],
                             byteArrays[ch][3*dp+1], byteArrays[ch][3*dp+2]);
                 }
             }

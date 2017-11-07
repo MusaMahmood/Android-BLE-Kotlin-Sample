@@ -44,6 +44,10 @@ internal class GraphAdapter
         if (this.plotData) plot(index.toDouble() * xAxisIncrement, data)
     }
 
+    fun addDataPointTimeDomainAlt(data: Double, index: Int) {
+        if (this.plotData) plotAlt(index.toDouble() * xAxisIncrement, data)
+    }
+
     fun setxAxisIncrementFromSampleRate(sampleRate: Int) {
         this.sampleRate = sampleRate
         setxAxisIncrement(1.toDouble() / sampleRate.toDouble())
@@ -56,17 +60,22 @@ internal class GraphAdapter
     //Graph Stuff:
     fun clearPlot() {
         if (this.series != null) {
-            DeviceControlActivity.mRedrawer.pause()
             while (this.series!!.size() > 0) {
                 this.series!!.removeFirst()
             }
-            DeviceControlActivity.mRedrawer.start()
         }
     }
 
     private fun plot(x: Double, y: Double) {
         while (series!!.size() > seriesHistoryDataPoints - 1) {
             series!!.removeFirst()
+        }
+        series!!.addLast(x, y)
+    }
+
+    private fun plotAlt(x: Double, y: Double) {
+        while (series!!.size() > seriesHistoryDataPoints - 1) {
+            series!!.removeLast()
         }
         series!!.addLast(x, y)
     }

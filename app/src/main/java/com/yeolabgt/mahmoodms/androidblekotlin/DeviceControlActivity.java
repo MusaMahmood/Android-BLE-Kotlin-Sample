@@ -393,7 +393,7 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
                 mPacketBuffer = 2;
             } else {
                 mSampleRate = 250;
-                mPacketBuffer = 2;
+                mPacketBuffer = 1;
             }
             Log.e(TAG, "mSampleRate: " + mSampleRate + "Hz");
             fPSD = jLoadfPSD(mSampleRate);
@@ -673,40 +673,40 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
 
         if (AppConstant.CHAR_EEG_CH1_SIGNAL.equals(characteristic.getUuid())) {
             byte[] mNewEEGdataBytes = characteristic.getValue();
-            if (!mCh1.chEnabled) {
-                mCh1.chEnabled = true;
+            if (!mCh1.getChEnabled()) {
+                mCh1.setChEnabled(true);
             }
             getDataRateBytes(mNewEEGdataBytes.length);
             if (mEEGConnected_2ch) {
                 mCh1.handleNewData(mNewEEGdataBytes);
-                if (mCh1.packetCounter == mPacketBuffer) {
+                if (mCh1.getPacketCounter() == mPacketBuffer) {
                     addToGraphBuffer(mCh1, mGraphAdapterCh1, true);
                 }
             }
         }
 
         if (AppConstant.CHAR_EEG_CH2_SIGNAL.equals(characteristic.getUuid())) {
-            if (!mCh2.chEnabled) {
-                mCh2.chEnabled = true;
+            if (!mCh2.getChEnabled()) {
+                mCh2.setChEnabled(true);
             }
             byte[] mNewEEGdataBytes = characteristic.getValue();
             int byteLength = mNewEEGdataBytes.length;
             getDataRateBytes(byteLength);
             if (mEEGConnected_2ch) {
                 mCh2.handleNewData(mNewEEGdataBytes);
-                if (mCh2.packetCounter == mPacketBuffer) {
+                if (mCh2.getPacketCounter() == mPacketBuffer) {
                     addToGraphBuffer(mCh2, mGraphAdapterCh2, false);
                 }
             }
         }
-        if (mCh1.chEnabled && mCh2.chEnabled) {
+        if (mCh1.getChEnabled() && mCh2.getChEnabled()) {
             mNumber2ChPackets++;
             mEEGConnected_2ch = true;
-            mCh1.chEnabled = false;
-            mCh2.chEnabled = false;
-            if (mCh1.characteristicDataPacketBytes != null && mCh2.characteristicDataPacketBytes != null) {
-                mPrimarySaveDataFile.writeToDisk(mCh1.characteristicDataPacketBytes,
-                        mCh2.characteristicDataPacketBytes);
+            mCh1.setChEnabled(false);
+            mCh2.setChEnabled(false);
+            if (mCh1.getCharacteristicDataPacketBytes() != null && mCh2.getCharacteristicDataPacketBytes() != null) {
+                mPrimarySaveDataFile.writeToDisk(mCh1.getCharacteristicDataPacketBytes(),
+                        mCh2.getCharacteristicDataPacketBytes());
             }
             if (mNumber2ChPackets % 10 == 0) { //Every x * 20 data points
                 Thread classifyTaskThread = new Thread(mClassifyTaskRunnableThread);
@@ -726,42 +726,46 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
     }
 
     void addToGraphBuffer(DataChannel dataChannel, GraphAdapter graphAdapter, boolean updateTrainingRoutine) {
-        if(mFilterData && dataChannel.totalDataPointsReceived>1000) {
-            float[] filteredData = jSSVEPCfilter(dataChannel.classificationBuffer);
+        if(mFilterData && dataChannel.getTotalDataPointsReceived() > 1000) {
+            float[] filteredData = jSSVEPCfilter(dataChannel.getClassificationBuffer());
             graphAdapter.clearPlot();
+
             for (int i = 0; i < filteredData.length; i++) { // gA.addDataPointTimeDomain(y,x)
-                graphAdapter.addDataPointTimeDomain(filteredData[i],
-                        dataChannel.totalDataPointsReceived
+                graphAdapter.addDataPointTimeDomainAlt(filteredData[i],
+                        dataChannel.getTotalDataPointsReceived()
                                 - 999 + i);
             }
+
         } else {
-            if (mPrimarySaveDataFile.getResolutionBits() == 24) {
-                for (int i = 0; i < dataChannel.dataBuffer.length / 3; i += graphAdapter.getSampleRate() / 250) {
-                    graphAdapter.addDataPointTimeDomain(DataChannel.bytesToDouble(dataChannel.dataBuffer[3 * i],
-                            dataChannel.dataBuffer[3 * i + 1], dataChannel.dataBuffer[3 * i + 2]),
-                            dataChannel.totalDataPointsReceived - dataChannel.dataBuffer.length / 3 + i);
-                    if (updateTrainingRoutine) {
-                        for (int j = 0; j < graphAdapter.getSampleRate() / 250; j++) {
-                            updateTrainingRoutine(dataChannel.totalDataPointsReceived - dataChannel.dataBuffer.length / 3 + i + j);
+            if(dataChannel.getDataBuffer()!=null) {
+                if (mPrimarySaveDataFile.getResolutionBits() == 24) {
+                    for (int i = 0; i < dataChannel.getDataBuffer().length / 3; i += graphAdapter.getSampleRate() / 250) {
+                        graphAdapter.addDataPointTimeDomain(DataChannel.Companion.bytesToDouble(dataChannel.getDataBuffer()[3 * i],
+                                dataChannel.getDataBuffer()[3 * i + 1], dataChannel.getDataBuffer()[3 * i + 2]),
+                                dataChannel.getTotalDataPointsReceived() - dataChannel.getDataBuffer().length / 3 + i);
+                        if (updateTrainingRoutine) {
+                            for (int j = 0; j < graphAdapter.getSampleRate() / 250; j++) {
+                                updateTrainingRoutine(dataChannel.getTotalDataPointsReceived() - dataChannel.getDataBuffer().length / 3 + i + j);
+                            }
                         }
                     }
-                }
-            } else if (mPrimarySaveDataFile.getResolutionBits() == 16) {
-                for (int i = 0; i < dataChannel.dataBuffer.length / 2; i += graphAdapter.getSampleRate() / 250) {
-                    graphAdapter.addDataPointTimeDomain(DataChannel.bytesToDouble(dataChannel.dataBuffer[2 * i],
-                            dataChannel.dataBuffer[2 * i + 1]),
-                            dataChannel.totalDataPointsReceived - dataChannel.dataBuffer.length / 2 + i);
-                    if (updateTrainingRoutine) {
-                        for (int j = 0; j < graphAdapter.getSampleRate() / 250; j++) {
-                            updateTrainingRoutine(dataChannel.totalDataPointsReceived - dataChannel.dataBuffer.length / 2 + i + j);
+                } else if (mPrimarySaveDataFile.getResolutionBits() == 16) {
+                    for (int i = 0; i < dataChannel.getDataBuffer().length / 2; i += graphAdapter.getSampleRate() / 250) {
+                        graphAdapter.addDataPointTimeDomain(DataChannel.Companion.bytesToDouble(dataChannel.getDataBuffer()[2 * i],
+                                dataChannel.getDataBuffer()[2 * i + 1]),
+                                dataChannel.getTotalDataPointsReceived() - dataChannel.getDataBuffer().length / 2 + i);
+                        if (updateTrainingRoutine) {
+                            for (int j = 0; j < graphAdapter.getSampleRate() / 250; j++) {
+                                updateTrainingRoutine(dataChannel.getTotalDataPointsReceived() - dataChannel.getDataBuffer().length / 2 + i + j);
+                            }
                         }
                     }
                 }
             }
         }
 
-        dataChannel.dataBuffer = null;
-        dataChannel.packetCounter = 0;
+        dataChannel.setDataBuffer(null);
+        dataChannel.setPacketCounter((short) 0);
     }
     //Put in Async task?
     private static class PowerSpectrumAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -784,8 +788,8 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
         mPSDCh2 = new double[mSampleRate];
         double[] getInstancePSD1 = new double[mSampleRate * 2];
         double[] getInstancePSD2 = new double[mSampleRate * 2];
-        System.arraycopy(mCh1.classificationBuffer, mSampleRate * 2, getInstancePSD1, 0, mSampleRate * 2);
-        System.arraycopy(mCh2.classificationBuffer, mSampleRate * 2, getInstancePSD2, 0, mSampleRate * 2);
+        System.arraycopy(mCh1.getClassificationBuffer(), mSampleRate * 2, getInstancePSD1, 0, mSampleRate * 2);
+        System.arraycopy(mCh2.getClassificationBuffer(), mSampleRate * 2, getInstancePSD2, 0, mSampleRate * 2);
         if(mSampleRate <8000) {
             Combined2ChPSDArray = jPSDExtraction(getInstancePSD1, getInstancePSD2, mSampleRate, (getInstancePSD1.length==getInstancePSD2.length)?(getInstancePSD1.length):0); //250 Hz: For PSDA/each channel[0>mSampleRate|mSampleRate:end]
             System.arraycopy(Combined2ChPSDArray, 0, mPSDCh1, 0, mSampleRate);
@@ -814,12 +818,12 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
                 //Run TF Model: SEE ORIGINAL .py SCRIPT TO VERIFY CORRECT INPUTS!
                 float[] outputScores = new float[5];//5 is number of classes/labels
                 float[] ch1_doubles = new float[WINDOW_DIMENSION_LENGTH_NORMAL];
-                System.arraycopy(mCh1.classificationBufferFloats,
-                        mCh1.classificationBufferSize-WINDOW_DIMENSION_LENGTH_NORMAL-1,
+                System.arraycopy(mCh1.getClassificationBufferFloats(),
+                        mCh1.getClassificationBufferSize() -WINDOW_DIMENSION_LENGTH_NORMAL-1,
                         ch1_doubles, 0, WINDOW_DIMENSION_LENGTH_NORMAL);
                 float[] ch2_doubles = new float[WINDOW_DIMENSION_LENGTH_NORMAL];
-                System.arraycopy(mCh2.classificationBufferFloats,
-                        mCh2.classificationBufferSize-WINDOW_DIMENSION_LENGTH_NORMAL-1,
+                System.arraycopy(mCh2.getClassificationBufferFloats(),
+                        mCh2.getClassificationBufferSize() -WINDOW_DIMENSION_LENGTH_NORMAL-1,
                         ch2_doubles, 0, WINDOW_DIMENSION_LENGTH_NORMAL);
                 float[] mSSVEPDataFeedTF = Floats.concat(ch1_doubles, ch2_doubles);
                 // 1 - feed probabilities:
@@ -836,8 +840,8 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
                 if (mSampleRate == 250) {
                     double[] getInstance1 = new double[mSampleRate * 2];
                     double[] getInstance2 = new double[mSampleRate * 2];
-                    System.arraycopy(mCh1.classificationBuffer, mSampleRate * 2, getInstance1, 0, mSampleRate * 2); //8000→end
-                    System.arraycopy(mCh2.classificationBuffer, mSampleRate * 2, getInstance2, 0, mSampleRate * 2);
+                    System.arraycopy(mCh1.getClassificationBuffer(), mSampleRate * 2, getInstance1, 0, mSampleRate * 2); //8000→end
+                    System.arraycopy(mCh2.getClassificationBuffer(), mSampleRate * 2, getInstance2, 0, mSampleRate * 2);
                     Y = jClassifySSVEP(getInstance1, getInstance2, 1.5); // Size of 501, where first two are
                 } else {
                     Y = new double[]{-1.0, -1.0}; //ERROR
