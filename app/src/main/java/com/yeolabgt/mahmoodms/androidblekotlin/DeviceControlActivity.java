@@ -439,7 +439,7 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
         mFreqDomainPlotAdapter.xyPlot.addSeries(mGraphAdapterCh2PSDA.series, mGraphAdapterCh2PSDA.lineAndPointFormatter);
 
         mRedrawer = new Redrawer(
-                Arrays.asList(new Plot[]{mTimeDomainPlotAdapter.xyPlot, mFreqDomainPlotAdapter.xyPlot}), 60, false);
+                Arrays.asList(new Plot[]{mTimeDomainPlotAdapter.xyPlot, mFreqDomainPlotAdapter.xyPlot}), 30, false);
         mRedrawer.start();
         mGraphInitializedBoolean = true;
     }
@@ -724,7 +724,6 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
 
     void addToGraphBuffer(DataChannel dataChannel, GraphAdapter graphAdapter, boolean updateTrainingRoutine) {
         if(mFilterData && dataChannel.totalDataPointsReceived>1000) {
-            mRedrawer.pause();
             float[] filteredData = jSSVEPCfilter(dataChannel.classificationBuffer);
             graphAdapter.clearPlot();
             for (int i = 0; i < filteredData.length; i++) { // gA.addDataPointTimeDomain(y,x)
@@ -732,7 +731,6 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
                         dataChannel.totalDataPointsReceived
                                 - 999 + i);
             }
-            mRedrawer.start();
         } else {
             if (mPrimarySaveDataFile.getResolutionBits() == 24) {
                 for (int i = 0; i < dataChannel.dataBuffer.length / 3; i += graphAdapter.sampleRate / 250) {
