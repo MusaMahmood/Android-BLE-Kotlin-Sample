@@ -540,18 +540,18 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) {
             //UI Stuff:
-            boolean chSel = PreferencesFragment.channelSelect(this);
-            boolean longPSDA = PreferencesFragment.psdaWideRange(this);
-            boolean showPSDA = PreferencesFragment.showPSDA(this);
-            boolean showUIElements = PreferencesFragment.showUIElements(this);
+            boolean chSel = PreferencesFragment.Companion.channelSelect(this);
+            boolean longPSDA = PreferencesFragment.Companion.psdaWideRange(this);
+            boolean showPSDA = PreferencesFragment.Companion.showPSDA(this);
+            boolean showUIElements = PreferencesFragment.Companion.showUIElements(this);
             //File Save Stuff
-            boolean saveTimestamps = PreferencesFragment.saveTimestamps(this);
-            short precision = (short) ((PreferencesFragment.setBitPrecision(this)) ? 64 : 32);
-            boolean saveClass = PreferencesFragment.saveClass(this);
+            boolean saveTimestamps = PreferencesFragment.Companion.saveTimestamps(this);
+            short precision = (short) ((PreferencesFragment.Companion.setBitPrecision(this)) ? 64 : 32);
+            boolean saveClass = PreferencesFragment.Companion.saveClass(this);
             mPrimarySaveDataFile.setSaveTimestamps(saveTimestamps);
             mPrimarySaveDataFile.setFpPrecision(precision);
             mPrimarySaveDataFile.setIncludeClass(saveClass);
-            boolean filterData = PreferencesFragment.setFilterData(this);
+            boolean filterData = PreferencesFragment.Companion.setFilterData(this);
             //TODO: for now just ch1:
             if(mGraphAdapterCh1!=null) {
                 mFilterData = filterData;
@@ -734,7 +734,7 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
             }
             mRedrawer.start();
         } else {
-            if (mPrimarySaveDataFile.getmResolutionBits() == 24) {
+            if (mPrimarySaveDataFile.getResolutionBits() == 24) {
                 for (int i = 0; i < dataChannel.dataBuffer.length / 3; i += graphAdapter.sampleRate / 250) {
                     graphAdapter.addDataPointTimeDomain(DataChannel.bytesToDouble(dataChannel.dataBuffer[3 * i],
                             dataChannel.dataBuffer[3 * i + 1], dataChannel.dataBuffer[3 * i + 2]),
@@ -745,7 +745,7 @@ public class DeviceControlActivity extends Activity implements BluetoothLe.Bluet
                         }
                     }
                 }
-            } else if (mPrimarySaveDataFile.getmResolutionBits() == 16) {
+            } else if (mPrimarySaveDataFile.getResolutionBits() == 16) {
                 for (int i = 0; i < dataChannel.dataBuffer.length / 2; i += graphAdapter.sampleRate / 250) {
                     graphAdapter.addDataPointTimeDomain(DataChannel.bytesToDouble(dataChannel.dataBuffer[2 * i],
                             dataChannel.dataBuffer[2 * i + 1]),

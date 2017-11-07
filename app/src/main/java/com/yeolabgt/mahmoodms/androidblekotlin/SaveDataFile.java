@@ -62,7 +62,7 @@ class SaveDataFile {
         this.includeClass = includeClass;
     }
 
-    public int getmResolutionBits() {
+    int getResolutionBits() {
         return mResolutionBits;
     }
 
