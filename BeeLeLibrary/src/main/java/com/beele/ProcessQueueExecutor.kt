@@ -26,7 +26,6 @@ class ProcessQueueExecutor : Thread() {
         get() = processList.size
 
     fun executeProcess() {
-
         if (!processList.isEmpty()) {
             val readWriteCharacteristic = processList[0]
             val type = readWriteCharacteristic.requestType
@@ -70,7 +69,6 @@ class ProcessQueueExecutor : Thread() {
                     }
                 }
             }
-
             removeProcess(readWriteCharacteristic)
         }
     }
