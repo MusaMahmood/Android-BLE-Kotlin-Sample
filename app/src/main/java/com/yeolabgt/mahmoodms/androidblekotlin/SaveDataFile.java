@@ -142,7 +142,7 @@ class SaveDataFile {
                 else writeCSVValue[dp][ch+1] = floats[ch][dp]+"";
             }
             if(this.includeClass) {
-                writeCSVValue[dp][columns-1] = DeviceControlActivity.mSSVEPClass + ""; //always last column
+                writeCSVValue[dp][columns-1] = DeviceControlActivity.Companion.getMSSVEPClass() + ""; //always last column
             }
             csvWriter.writeNext(writeCSVValue[dp], false);
             this.mLinesWritten++;
@@ -165,7 +165,7 @@ class SaveDataFile {
                 else writeCSVValue[dp][ch+1] = doubles[ch][dp]+"";
             }
             if(this.includeClass) {
-                writeCSVValue[dp][columns-1] = DeviceControlActivity.mSSVEPClass + ""; //always last column
+                writeCSVValue[dp][columns-1] = DeviceControlActivity.Companion.getMSSVEPClass() + ""; //always last column
             }
             csvWriter.writeNext(writeCSVValue[dp], false);
             this.mLinesWritten++;
