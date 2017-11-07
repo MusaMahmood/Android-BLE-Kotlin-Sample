@@ -57,7 +57,7 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
     private var mTimeDomainPlotAdapter: XYPlotAdapter? = null
     //Device Information
     private var mBleInitializedBoolean = false
-    private lateinit var mBluetoothGattArray: Array<BluetoothGatt>
+    private lateinit var mBluetoothGattArray: Array<BluetoothGatt?>
     private var mBluetoothLe: BluetoothLe? = null
     private var mDeviceName: String? = null
     private var mDeviceAddress: String? = null
@@ -441,7 +441,7 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
     private fun disconnectAllBLE() {
         if (mBluetoothLe != null) {
             for (bluetoothGatt in mBluetoothGattArray) {
-                mBluetoothLe!!.disconnect(bluetoothGatt)
+                mBluetoothLe!!.disconnect(bluetoothGatt!!)
                 mConnected = false
                 resetMenuBar()
             }
@@ -567,10 +567,14 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
                     continue
                 }
                 if (AppConstant.SERVICE_DEVICE_INFO == service.uuid) {
-                    //Read the device serial number
-                    mBluetoothLe!!.readCharacteristic(gatt, service.getCharacteristic(AppConstant.CHAR_SERIAL_NUMBER))
-                    //Read the device software version
-                    mBluetoothLe!!.readCharacteristic(gatt, service.getCharacteristic(AppConstant.CHAR_SOFTWARE_REV))
+                    //Read the device serial number (if available)
+                    if(service.getCharacteristic(AppConstant.CHAR_SERIAL_NUMBER) != null) {
+                        mBluetoothLe!!.readCharacteristic(gatt, service.getCharacteristic(AppConstant.CHAR_SERIAL_NUMBER))
+                    }
+                    //Read the device software version (if available)
+                    if(service.getCharacteristic(AppConstant.CHAR_SOFTWARE_REV) != null) {
+                        mBluetoothLe!!.readCharacteristic(gatt, service.getCharacteristic(AppConstant.CHAR_SOFTWARE_REV))
+                    }
                 }
                 if (AppConstant.SERVICE_WHEELCHAIR_CONTROL == service.uuid) {
                     mLedWheelchairControlService = service
@@ -824,7 +828,7 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
             }
         }
         if (mLedWheelchairControlService != null && mWheelchairControl) {
-            mBluetoothLe!!.writeCharacteristic(mBluetoothGattArray[mWheelchairGattIndex], mLedWheelchairControlService!!.getCharacteristic(AppConstant.CHAR_WHEELCHAIR_CONTROL), bytes)
+            mBluetoothLe!!.writeCharacteristic(mBluetoothGattArray[mWheelchairGattIndex]!!, mLedWheelchairControlService!!.getCharacteristic(AppConstant.CHAR_WHEELCHAIR_CONTROL), bytes)
         }
     }
 
@@ -917,7 +921,7 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
                 return@Runnable
             }
             // request RSSI value
-            mBluetoothGattArray[0].readRemoteRssi()
+            mBluetoothGattArray[0]!!.readRemoteRssi()
             // add call it once more in the future
             readPeriodicallyRssiValue(mTimerEnabled)
         }, RSSI_UPDATE_TIME_INTERVAL.toLong())
