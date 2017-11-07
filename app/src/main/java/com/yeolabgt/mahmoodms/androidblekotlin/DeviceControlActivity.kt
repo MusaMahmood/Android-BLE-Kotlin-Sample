@@ -567,12 +567,14 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
                     continue
                 }
                 if (AppConstant.SERVICE_DEVICE_INFO == service.uuid) {
-                    //Read the device serial number
+                    //Read the device serial number (if available)
                     if(service.getCharacteristic(AppConstant.CHAR_SERIAL_NUMBER) != null) {
                         mBluetoothLe!!.readCharacteristic(gatt, service.getCharacteristic(AppConstant.CHAR_SERIAL_NUMBER))
                     }
-                    //Read the device software version
-                    mBluetoothLe!!.readCharacteristic(gatt, service.getCharacteristic(AppConstant.CHAR_SOFTWARE_REV))
+                    //Read the device software version (if available)
+                    if(service.getCharacteristic(AppConstant.CHAR_SOFTWARE_REV) != null) {
+                        mBluetoothLe!!.readCharacteristic(gatt, service.getCharacteristic(AppConstant.CHAR_SOFTWARE_REV))
+                    }
                 }
                 if (AppConstant.SERVICE_WHEELCHAIR_CONTROL == service.uuid) {
                     mLedWheelchairControlService = service
