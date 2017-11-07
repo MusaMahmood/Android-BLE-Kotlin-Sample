@@ -106,10 +106,10 @@ internal class DataChannel(var chEnabled: Boolean, MSBFirst: Boolean, //Classifi
             return (b.toInt() and 0xFF)
         }
 
-        private fun unsignedToSigned(unsignedInt: Int, size: Int): Int {
-            var unsigned = unsignedInt
-            if (unsigned and (1 shl size - 1) != 0) unsigned = -1 * ((1 shl size - 1) - (unsigned and (1 shl size - 1) - 1))
-            return unsigned
-        }
+//        private fun unsignedToSigned(unsignedInt: Int, size: Int): Int {
+//            var unsigned = unsignedInt
+//            if (unsigned and (1 shl size - 1) != 0) unsigned = -1 * ((1 shl size - 1) - (unsigned and (1 shl size - 1) - 1))
+//            return unsigned
+//        }
     }
 }

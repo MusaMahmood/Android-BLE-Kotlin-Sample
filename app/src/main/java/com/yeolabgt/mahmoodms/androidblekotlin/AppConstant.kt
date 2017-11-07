@@ -10,22 +10,6 @@ import java.util.UUID
 // give it an empty constructor.
 class AppConstant {
     companion object {
-
-        /**
-         * For new EMG:
-         */
-        internal val SERVICE_3CH_EMG_SIGNAL = UUID.fromString("228b3460-35fd-875f-39fe-b2a394d28057")
-        //Characteristic2:
-        internal val CHAR_3CH_EMG_SIGNAL_CH1 = UUID.fromString("00003461-0000-1000-8000-00805f9b34fb")
-        internal val CHAR_3CH_EMG_SIGNAL_CH2 = UUID.fromString("00003462-0000-1000-8000-00805f9b34fb")
-        internal val CHAR_3CH_EMG_SIGNAL_CH3 = UUID.fromString("00003463-0000-1000-8000-00805f9b34fb")
-        /**
-         * For EOG (new)
-         */
-        internal val SERVICE_EOG_SIGNAL = UUID.fromString("228be0f0-35fd-875f-39fe-b2a394d28057")//E0F0
-        internal val CHAR_EOG_CH1_SIGNAL = UUID.fromString("0000e0f1-0000-1000-8000-00805f9b34fb")
-        internal val CHAR_EOG_CH2_SIGNAL = UUID.fromString("0000e0f2-0000-1000-8000-00805f9b34fb")
-        internal val CHAR_EOG_CH3_SIGNAL = UUID.fromString("0000e0f3-0000-1000-8000-00805f9b34fb")
         /**
          * For EEG:
          */

@@ -17,11 +17,8 @@ import android.widget.TextView
 
 internal class ScannedDeviceAdapter//Constructor
 (context: Context, private val resId: Int, private val list: MutableList<ScannedDevice>) : ArrayAdapter<ScannedDevice>(context, resId, list) {
-    private val inflater: LayoutInflater
 
-    init {
-        inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    }
+    private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getView(position: Int, view: View?, parent: ViewGroup?): View {
         var convertView = view

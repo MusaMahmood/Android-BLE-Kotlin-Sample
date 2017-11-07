@@ -130,14 +130,15 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
             mNumberOfClassifierCalls++
         } else {
             Log.e(TAG, "[" + (mNumberOfClassifierCalls + 1).toString() + "] CALLING CLASSIFIER FUNCTION!")
-            if (mSampleRate == 250) {
-                val getInstance1 = DoubleArray(mSampleRate * 2)
-                val getInstance2 = DoubleArray(mSampleRate * 2)
-                System.arraycopy(mCh1!!.classificationBuffer, mSampleRate * 2, getInstance1, 0, mSampleRate * 2) //8000→end
-                System.arraycopy(mCh2!!.classificationBuffer, mSampleRate * 2, getInstance2, 0, mSampleRate * 2)
-                y = jClassifySSVEP(getInstance1, getInstance2, 1.5) // Size of 501, where first two are
-            } else {
-                y = doubleArrayOf(-1.0, -1.0) //ERROR
+            y = when (mSampleRate) {
+                250 -> {
+                    val getInstance1 = DoubleArray(mSampleRate * 2)
+                    val getInstance2 = DoubleArray(mSampleRate * 2)
+                    System.arraycopy(mCh1!!.classificationBuffer, mSampleRate * 2, getInstance1, 0, mSampleRate * 2) //8000→end
+                    System.arraycopy(mCh2!!.classificationBuffer, mSampleRate * 2, getInstance2, 0, mSampleRate * 2)
+                    jClassifySSVEP(getInstance1, getInstance2, 1.5)
+                }
+                else -> doubleArrayOf(-1.0, -1.0)
             }
             mNumberOfClassifierCalls++
             Log.e(TAG, "Classifier Output: [#" + mNumberOfClassifierCalls.toString() + "::" + y[0].toString() + "," + y[1].toString() + "]")
@@ -227,22 +228,25 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
         }
         mTensorflowSwitch.setOnCheckedChangeListener { compoundButton, b ->
             if (b) {
-                if (customModel.exists()) {
-                    mTFInferenceInterface = TensorFlowInferenceInterface(assets, customModelPath)
-                    //Reset counter:
-                    mNumberOfClassifierCalls = 1
-                    mTFRunModel = true
-                    Log.i(TAG, "Tensorflow: customModel loaded")
-                } else if (embeddedModel.exists()) {
-                    //Check if there's a model included:
-                    mTFInferenceInterface = TensorFlowInferenceInterface(assets, MODEL_FILENAME)
-                    mTFRunModel = true
-                    Log.i(TAG, "Tensorflow: embeddedModel loaded")
-                } else {
-                    // No model found, continuing with original (reset switch)
-                    compoundButton.isChecked = false
-                    mTFRunModel = false
-                    Toast.makeText(applicationContext, "No TF Model Found!", Toast.LENGTH_LONG).show()
+                when {
+                    customModel.exists() -> {
+                        mTFInferenceInterface = TensorFlowInferenceInterface(assets, customModelPath)
+                        //Reset counter:
+                        mNumberOfClassifierCalls = 1
+                        mTFRunModel = true
+                        Log.i(TAG, "Tensorflow: customModel loaded")
+                    }
+                    embeddedModel.exists() -> { //Check if there's a model included:
+                        compoundButton.isChecked = false
+                        mTFRunModel = false
+                        Toast.makeText(applicationContext, "No TF Model Found!", Toast.LENGTH_LONG).show()
+                    }
+                    else -> {
+                        // No model found, continuing with original (reset switch)
+                        compoundButton.isChecked = false
+                        mTFRunModel = false
+                        Toast.makeText(applicationContext, "No TF Model Found!", Toast.LENGTH_LONG).show()
+                    }
                 }
                 if (mTFRunModel) {
                     Toast.makeText(applicationContext, "TF Model Loaded", Toast.LENGTH_SHORT).show()
@@ -331,32 +335,33 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
             }
             if ("EMG 250Hz" == mBluetoothDeviceArray[i]!!.name) {
                 mMSBFirst = false
-            } else if ("EMG 3CH 250Hz" == mBluetoothDeviceArray[i]!!.name) {
-                mMSBFirst = true
             } else if (mBluetoothDeviceArray[i]!!.name != null) {
-                if (mBluetoothDeviceArray[i]!!.name.toLowerCase().contains("nRF52".toLowerCase())) {
+                if (mBluetoothDeviceArray[i]!!.name.toLowerCase().contains("nrf52")) {
                     mMSBFirst = true
                 }
             }
-            if (mBluetoothDeviceArray[i]!!.name.toLowerCase().contains("8k".toLowerCase())) {
-                mSampleRate = 8000
-                mPacketBuffer = 32
-            } else if (mBluetoothDeviceArray[i]!!.name.toLowerCase().contains("4k".toLowerCase())) {
-                mSampleRate = 4000
-                mPacketBuffer = 16
-            } else if (mBluetoothDeviceArray[i]!!.name.toLowerCase().contains("2k".toLowerCase())) {
-                mSampleRate = 2000
-                mPacketBuffer = 8
-            } else if (mBluetoothDeviceArray[i]!!.name.toLowerCase().contains("1k".toLowerCase())) {
-                mSampleRate = 1000
-                mPacketBuffer = 4
-            } else if (mBluetoothDeviceArray[i]!!.name.toLowerCase().contains("500".toLowerCase())) {
-                mSampleRate = 500
-                mPacketBuffer = 2
-            } else {
-                mSampleRate = 250
-                mPacketBuffer = 1
+            val str = mBluetoothDeviceArray[i]!!.name.toLowerCase()
+            when {
+                str.contains("8k") -> {
+                    mSampleRate = 8000
+                }
+                str.contains("4k") -> {
+                    mSampleRate = 4000
+                }
+                str.contains("2k") -> {
+                    mSampleRate = 2000
+                }
+                str.contains("1k") -> {
+                    mSampleRate = 1000
+                }
+                str.contains("500") -> {
+                    mSampleRate = 500
+                }
+                else -> {
+                    mSampleRate = 250
+                }
             }
+            mPacketBuffer = mSampleRate/250
             Log.e(TAG, "mSampleRate: " + mSampleRate + "Hz")
             fPSD = jLoadfPSD(mSampleRate)
             Log.d(TAG, "initializeBluetoothArray: jLoadfPSD: " + fPSD!!.size.toString())
@@ -429,7 +434,7 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
         }
 
         stopMonitoringRssiValue()
-        jmainInitialization(true) //Just a technicality; doesn't actually do anything
+        jmainInitialization(true) //Just a technicality, doesn't actually do anything
         super.onDestroy()
     }
 
@@ -745,33 +750,39 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
             val second = dataPoints / mSampleRate
             val mSDS = mStimulusDelaySeconds.toInt()
             var eventSecondCountdown = 0
-            if (second >= 0 && second < mSDS) {
-                eventSecondCountdown = mSDS - second
-                updateTrainingPrompt("EYES CLOSED")
-                updateTrainingPromptColor(Color.GREEN)
-                mSSVEPClass = 0.0
-            } else if (second >= mSDS && second < 2 * mSDS) {
-                eventSecondCountdown = 2 * mSDS - second
-                updateTrainingPrompt("15.15Hz")
-                mSSVEPClass = 1.0
-            } else if (second >= 2 * mSDS && second < 3 * mSDS) {
-                eventSecondCountdown = 3 * mSDS - second
-                updateTrainingPrompt("16.67hz")
-                mSSVEPClass = 2.0
-            } else if (second >= 3 * mSDS && second < 4 * mSDS) {
-                eventSecondCountdown = 4 * mSDS - second
-                updateTrainingPrompt("18.51Hz")
-                mSSVEPClass = 3.0
-            } else if (second >= 4 * mSDS && second < 5 * mSDS) {
-                eventSecondCountdown = 5 * mSDS - second
-                updateTrainingPrompt("20.00Hz")
-                mSSVEPClass = 4.0
-            } else if (second >= 5 * mSDS && second < 6 * mSDS) {
-                eventSecondCountdown = 6 * mSDS - second
-                updateTrainingPrompt("Stop!")
-                updateTrainingPromptColor(Color.RED)
-                mSSVEPClass = 0.0
-                disconnectAllBLE()
+            when {
+                (second in 0..mSDS) -> {
+                    eventSecondCountdown = mSDS - second
+                    updateTrainingPrompt("EYES CLOSED")
+                    updateTrainingPromptColor(Color.GREEN)
+                }
+                (second in mSDS..(2*mSDS)) -> {
+                    eventSecondCountdown = 2 * mSDS - second
+                    updateTrainingPrompt("15.15Hz")
+                    mSSVEPClass = 1.0
+                }
+                (second in (2*mSDS)..(3*mSDS)) -> {
+                    eventSecondCountdown = 3 * mSDS - second
+                    updateTrainingPrompt("16.67hz")
+                    mSSVEPClass = 2.0
+                }
+                (second in (3*mSDS)..(4*mSDS)) -> {
+                    eventSecondCountdown = 4 * mSDS - second
+                    updateTrainingPrompt("18.51Hz")
+                    mSSVEPClass = 3.0
+                }
+                (second in (4*mSDS)..(5*mSDS)) -> {
+                    eventSecondCountdown = 5 * mSDS - second
+                    updateTrainingPrompt("20.00Hz")
+                    mSSVEPClass = 4.0
+                }
+                (second in (5*mSDS)..(6*mSDS)) -> {
+                    eventSecondCountdown = 6 * mSDS - second
+                    updateTrainingPrompt("Stop!")
+                    updateTrainingPromptColor(Color.RED)
+                    mSSVEPClass = 0.0
+                    disconnectAllBLE()
+                }
             }
             if (eventSecondCountdown == mSDS) {
                 mMediaBeep.start()
@@ -941,13 +952,10 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
         val convertedBatteryVoltage = integerValue.toDouble() / 4096.0 * 7.20
         //Because TPS63001 dies below 1.8V, we need to set up a linear fit between 1.8-4.2V
         //Anything over 4.2V = 100%
-        val finalPercent: Double
-        if (125.0 / 3.0 * convertedBatteryVoltage - 75.0 > 100.0) {
-            finalPercent = 100.0
-        } else if (125.0 / 3.0 * convertedBatteryVoltage - 75.0 < 0) {
-            finalPercent = 0.0
-        } else {
-            finalPercent = 125.0 / 3.0 * convertedBatteryVoltage - 75.0
+        val finalPercent: Double = when {
+            125.0 / 3.0 * convertedBatteryVoltage - 75.0 > 100.0 -> 100.0
+            125.0 / 3.0 * convertedBatteryVoltage - 75.0 < 0.0 -> 0.0
+            else -> 125.0 / 3.0 * convertedBatteryVoltage - 75.0
         }
         Log.e(TAG, "Battery Integer Value: " + integerValue.toString())
         Log.e(TAG, "ConvertedBatteryVoltage: " + String.format(Locale.US, "%.5f", convertedBatteryVoltage) + "V : " + String.format(Locale.US, "%.3f", finalPercent) + "%")
