@@ -659,8 +659,7 @@ class DeviceControlActivity : Activity(), BluetoothLe.BluetoothLeListener {
             mCh1!!.chEnabled = false
             mCh2!!.chEnabled = false
             if (mCh1!!.characteristicDataPacketBytes != null && mCh2!!.characteristicDataPacketBytes != null) {
-                mPrimarySaveDataFile!!.writeToDisk(mCh1!!.characteristicDataPacketBytes,
-                        mCh2!!.characteristicDataPacketBytes)
+                mPrimarySaveDataFile!!.writeToDisk(mCh1!!.characteristicDataPacketBytes, mCh2!!.characteristicDataPacketBytes)
             }
             if (mNumber2ChPackets % 10 == 0) { //Every x * 20 data points
                 val classifyTaskThread = Thread(mClassifyTaskRunnableThread)
