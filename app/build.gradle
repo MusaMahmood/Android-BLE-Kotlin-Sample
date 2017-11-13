@@ -26,7 +26,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId "com.yeolabgt.mahmoodms.androidblekotlin"
+        applicationId "com.yeolabgt.mahmoodms.androidblekotlinsample"
         minSdkVersion 22
         targetSdkVersion 26
         versionCode 1
@@ -80,7 +80,7 @@ dependencies {
     //Added
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     compile files('libs/opencsv-3.7.jar')
-    compile project(':BeeLeLibrary')
+    compile project(':actblelibrary')
     compile 'com.androidplot:androidplot-core:1.5.1'
     compile 'com.google.guava:guava:23.0-android'
 
